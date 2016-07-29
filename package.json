@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/drewpchannel/kanbanKanban/issues"
   },
-  "homepage": "https://github.com/drewpchannel/kanbanKanban#readme"
+  "homepage": "https://github.com/drewpchannel/kanbanKanban#readme",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "gulp": "^3.9.1"
+  }
 }
