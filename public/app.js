@@ -31,7 +31,7 @@ var arrayTwo = [
 
   render() {
     return (
-      <div>
+      <div id="bigk">
         <h1> Big Kanban </h1>
         <ToDoPostsOne data={this.state.dataOne}/>
         <ToDoPostsTwo data={this.state.second_Data}/>
@@ -48,7 +48,7 @@ class ToDoPostsOne extends React.Component {
         )
     });
     return (
-      <div>
+      <div id="list">
         <h1>Christian To Do List</h1>
         { theNode }
       </div>
@@ -64,7 +64,7 @@ class ToDoPostsTwo extends React.Component {
         )
     });
     return (
-      <div>
+      <div id="list">
         <h1>Kim Jong Il To Do List</h1>
         { theNode }
       </div>
@@ -77,7 +77,7 @@ class PostItems extends React.Component {
   render() {
   console.log('this.props.data: ', this.props.data)
     return (
-      <div className='redditItem'>
+      <div className='theposts'>
         <h3>{this.props.title}</h3>
         <p>{this.props.author}</p>
       </div>
