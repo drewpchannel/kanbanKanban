@@ -7,7 +7,10 @@ const config = {
   //My application will actually live in app.js but
   entry: './entry.jsx',
   //All that stuff that's outputted, it's going to all bundle into this bundle.js
-  output: { path: __dirname, filename: 'bundle.js' },
+  output: {
+    path: __dirname,
+    filename: 'bundle.js'
+  },
   module: {
     //PS: Can you babble-fy all this over here, too?
     loaders: [

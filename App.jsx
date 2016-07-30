@@ -15,6 +15,7 @@ class App extends React.Component {
        /* <li><Link to='/'>Home</Link></li>
         <li><Link to='/about'>About</Link></li>*/
       </ul>
+        <BigKanban />
      /* <BigKanban url='https://www.reddit.com/r/news.json'/>*/
       </div>
     )
