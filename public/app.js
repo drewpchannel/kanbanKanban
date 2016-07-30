@@ -97,4 +97,3 @@ ReactDOM.render(
   <BigKanban />,
   document.getElementById('content')
 );
-
