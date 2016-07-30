@@ -1,4 +1,5 @@
 'use strict';
+
 var arrayOne = [
   {id:1, title:'Pray', authors:'jojoebinks'},
   {id:2, title:'Order Holy Water', authors:'sgnl'},
@@ -13,12 +14,12 @@ var arrayTwo = [
   {id:14, title:'Call Son', authors:'theRemix'},
 ];
 
-  class BigKanban extends React.Component {
-    constructor(){
-      super();
-      this.state = {
-        dataOne : [],
-        second_Data : []
+class BigKanban extends React.Component {
+  constructor(){
+    super();
+    this.state = {
+      dataOne : [],
+      second_Data : []
     }
   };
 
