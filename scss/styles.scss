@@ -1,19 +1,32 @@
+#list:nth-of-type(2) {
+ color: #ccc;
+ background-color:#999999;
+}
+
 #bigk {
-  background-color:gray;
+  text-align: center;
+  color: black;
+  font-family: Palatino;
+  background-color:coral;
   margin: 0px 0px 0px 0px;
-  padding:10px;
+  padding: 1px 20px 20px 20px;
+  border-radius: 50px;
 }
 
 #list {
+  color: gray;
   background-color:#ccc;
   margin: 10px 10px 0px 10px;
-  padding:1px;
+  padding: 1px 10px 10px 20px;
+  border-radius: 20px;
 }
 
 .theposts {
+  color: coral;
   background-color:white;
   margin: 10px 10px 10px 10px;
-  padding:1px;
+  padding: 1px 10px 1px 10px;
+  border-radius: 10px;
 }
 
 
