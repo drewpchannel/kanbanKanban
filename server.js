@@ -3,23 +3,19 @@ const express = require('express');
 const app = express();
 const PORT = 2459;
 var Router = require('./routes/router');
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/test');
+app.use(express.static(__dirname));
 
-// const RouterX = express.Router();
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+})
 
-
-/*  ROUTES  */
-// app.use('/kanban', router);
-app.use(express.static('public'));
-app.use('/', Router);
-
-// app.route('/someroute')
-//   .get((req, res) =>{
-//     // res.render('index');
-//   });
-
-
-app.listen(PORT, function() {
-  console.log('testing');
+app.get('/', function(req, res) {
+    res.sendFile(__dirname+'/public/index.html');
 });
 
-// module.exports = express;
+app.listen(PORT, (req, res) => {
+  console.log('Server is on')
+})
