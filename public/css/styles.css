@@ -65,7 +65,7 @@ table {
 
 /* close commented backslash hack */
 #list:nth-of-type(2) {
-  color: brown;
+  color: black;
   background-color: orange; }
 
 #list:nth-of-type(3) {
