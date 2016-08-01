@@ -1,4 +1,15 @@
 'use strict';
+/*======================================
+=            XMLHttpRequest            =
+======================================*/
+var oReq = new XMLHttpRequest();
+oReq.addEventListener("load", () => {
+  arrayOne = this
+});
+
+oReq.open("GET", "http://localhost:2359/getAll");
+oReq.send();
+
 /*============================================
 =            Hard-coded Test Data            =
 ============================================*/
@@ -100,15 +111,20 @@ class PostItems extends React.Component {
       })
   }
   updateStatus(){
-    this.props.updateCard(this.state);
+    this.props.updateCard(this.state)
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", reqListener);
+    oReq.open("GET", "http://localhost:2459/test");
+    oReq.send();
   }
   render() {
     return (
       <div className='theposts'>
         <h3>{this.state.title}</h3>
         <p>{this.state.author}</p>
-          <div>
-            <button onClick={this.updateStatus}>Update Status</button>
+          <div className="buttonDiv">
+            <a className="updateButton" href={this.updateStatus}>Update Status</a>
+            <button> </button>
           </div>
       </div>
     );
@@ -125,6 +141,10 @@ BigKanban.PropTypes = {
 BigKanban.defaultProps = {
   data: []
 };
+
+function reqListener(){
+  console.log(this.responseText);
+}
 
 /*====================================
 =            React Render            =

@@ -64,6 +64,20 @@ table {
   display: block; }
 
 /* close commented backslash hack */
+.buttonDiv {
+  align-items: flex-end; }
+
+.updateButton {
+  font-size: 10px;
+  font-family: arial;
+  color: white;
+  text-decoration: none;
+  background: #888888;
+  padding: 3px;
+  border-radius: 7px;
+  vertical-align: bottom;
+  border-color: gray; }
+
 #list:nth-of-type(2) {
   color: black;
   background-color: orange; }
@@ -99,7 +113,6 @@ body {
 
 #list {
   font-size: 15px;
-  box-sizing: border-box;
   width: 200px;
   display: table-cell;
   color: orange;
@@ -108,10 +121,7 @@ body {
   border-radius: 5px;
   border-style: solid;
   border-color: #d9d9d9;
-  border-width: 2px;
-  box-sizing: border-box;
-  justify-content: center;
-  align-items: center; }
+  border-width: 2px; }
 
 .theposts {
   box-sizing: border-box;
@@ -120,11 +130,8 @@ body {
   color: coral;
   background-color: white;
   margin: 0 auto;
-  padding: 15% 0;
+  padding: 20px;
   border-radius: 3px;
   border-style: solid;
   border-color: orange;
-  border-width: 1px;
-  box-sizing: border-box;
-  justify-content: center;
-  align-items: center; }
+  border-width: 1px; }

@@ -10,13 +10,14 @@ const Schema = mongoose.Schema;
 const CardSchema = new Schema({
   id: Number,
   title: String,
+  description: String,
   priority: String,
   status : String,
   createdBy: String,
   assignedTo: String,
+  date: {type: Date, default: Date.now}
 });
 
 
 /*=====  End of CardSchema  ======*/
-
-module.exports = mongoose.model('card', CardSchema);
+module.exports = mongoose.model('CardSchema', CardSchema);
