@@ -1,52 +1,57 @@
 'use strict';
 
-var arrayOne = [
-  {id:1, title:'Pray', authors:'jojoebinks'},
-  {id:2, title:'Order Holy Water', authors:'sgnl'},
-  {id:3, title:'Kick it with Big G', authors:'jaywon'},
-  {id:4, title:'Clean confession box', authors:'theRemix'},
-];
-
-var arrayTwo = [
-  {id:11, title:'Order shoes', authors:'jojoebinks'},
-  {id:12, title:'Order booze', authors:'sgnl'},
-  {id:13, title:'Threaten South Korea', authors:'jaywon'},
-  {id:14, title:'Call Son', authors:'theRemix'},
-];
-
 class BigKanban extends React.Component {
   constructor(){
     super();
     this.state = {
-      dataOne : [],
+      todoColData : [],
       second_Data : []
     }
+    this.updateCard = this.updateCard.bind(this)
   };
+
 
   componentDidMount() {
-    this.state.dataOne = arrayOne;
-    this.setState({data: arrayOne});
-    this.state.second_Data = arrayTwo;
-    this.setState({second_Data: arrayTwo});
+    let componentContext = this
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", function () {
+      let xhrData = JSON.parse(this.response)
+      componentContext.setState({
+        todoColData: xhrData.filter(function (card){
+          return card.status === 'todo'
+        })
+      });
+      // repeat this filter for the next 2 columns
+    });
+    oReq.open("GET", "http://localhost:2459/getAll");
+    oReq.send();
   };
 
+  updateCard(newCard) {
+    console.log('in update card')
+  }
+
   render() {
+  console.log(this.state.todoColData)
     return (
       <div>
         <h1> Big Kanban </h1>
-        <ToDoPostsOne data={this.state.dataOne}/>
-        <ToDoPostsTwo data={this.state.second_Data}/>
+          <KanbanCol data={this.state.todoColData} updateCard={this.updateCard}/>
       </div>
     );
   };
 };
 
-class ToDoPostsOne extends React.Component {
+class KanbanCol extends React.Component {
   render() {
-    var theNode = this.props.data.map(function(passedData) {
+    var parent = this;
+    var theNode = this.props.data.map(function(postData) {
       return (
-        <PostItems title={passedData.title} author={passedData.author} key={passedData.id}/>
-        )
+        <PostItems {...postData}
+          updateCard={parent.props.updateCard}
+          key={postData._id}
+        />
+      )
     });
     return (
       <div>
@@ -61,7 +66,7 @@ class ToDoPostsTwo extends React.Component {
   render() {
     var theNode = this.props.data.map(function(passedData) {
       return (
-        <PostItems title={passedData.title} author={passedData.author} key={passedData.id}/>
+        <PostItems {...passedData} key={passedData.id}/>
         )
     });
     return (
@@ -75,12 +80,36 @@ class ToDoPostsTwo extends React.Component {
 
 
 class PostItems extends React.Component {
+  constructor(){
+    super()
+    this.state = {id: null, title: '', priority: '', status: '', createdBy: '', assignedTo: ''}
+    this.updateStatus = this.updateStatus.bind(this)
+  }
+  componentDidMount() {
+    this.setState({
+      id: this.props.id,
+      title: this.props.title,
+      priority: this.props.priority,
+      status: this.props.status,
+      createdBy: this.props.createdBy,
+      assignedTo: this.props.assignedTo
+    })
+  }
+  updateStatus(){
+    this.props.updateCard(this.state)
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", function (){
+      console.log(this.responseText);
+    });
+    oReq.open("GET", "http://localhost:2459/getAll");
+    oReq.send();
+  }
   render() {
-  console.log('this.props.data: ', this.props.data)
     return (
       <div className='redditItem'>
-        <h3>{this.props.title}</h3>
-        <p>{this.props.author}</p>
+        <h3>{this.state.title}</h3>
+        <p>{this.state.author}</p>
+        <button onClick={this.updateStatus}>Put</button>
       </div>
     );
   };
@@ -98,4 +127,5 @@ ReactDOM.render(
   <BigKanban />,
   document.getElementById('content')
 );
+
 
