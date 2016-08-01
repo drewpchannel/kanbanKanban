@@ -4,10 +4,12 @@ const app = express();
 const PORT = 2459;
 const Router = require('./routes/router');
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 mongoose.Promise = require('bluebird');
 
 mongoose.connect('mongodb://localhost/Kanban');
 app.use(express.static('public'));
+app.use(bodyParser.json());
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -37,8 +39,8 @@ app.get('/info', function(req, res) {
     })*/
 });
 
-app.get('/putest', (req, res) => {
-
+app.put('/:cardId', (req, res) => {
+  console.log(req.body)
 })
 
 app.listen(PORT, (req, res) => {

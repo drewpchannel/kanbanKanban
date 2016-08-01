@@ -27,12 +27,18 @@ class BigKanban extends React.Component {
     oReq.send();
   };
 
-  updateCard(newCard) {
-    console.log('in update card')
+  updateCard(card) {
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", function (){
+      console.log(this.responseText);
+    });
+    console.log(card)
+    oReq.open("PUT", `http://localhost:2459/${card._id}/`);
+    oReq.setRequestHeader("Content-Type", "application/json");
+    oReq.send(JSON.stringify({status: 'statusButtonNext'}));
   }
 
   render() {
-  console.log(this.state.todoColData)
     return (
       <div>
         <h1> Big Kanban </h1>
@@ -66,7 +72,7 @@ class ToDoPostsTwo extends React.Component {
   render() {
     var theNode = this.props.data.map(function(passedData) {
       return (
-        <PostItems {...passedData} key={passedData.id}/>
+        <PostItems {...passedData} key={passedData._id}/>
         )
     });
     return (
@@ -82,12 +88,12 @@ class ToDoPostsTwo extends React.Component {
 class PostItems extends React.Component {
   constructor(){
     super()
-    this.state = {id: null, title: '', priority: '', status: '', createdBy: '', assignedTo: ''}
+    this.state = {_id: null, title: '', priority: '', status: '', createdBy: '', assignedTo: ''}
     this.updateStatus = this.updateStatus.bind(this)
   }
   componentDidMount() {
     this.setState({
-      id: this.props.id,
+      _id: this.props._id,
       title: this.props.title,
       priority: this.props.priority,
       status: this.props.status,
@@ -97,12 +103,6 @@ class PostItems extends React.Component {
   }
   updateStatus(){
     this.props.updateCard(this.state)
-    var oReq = new XMLHttpRequest();
-    oReq.addEventListener("load", function (){
-      console.log(this.responseText);
-    });
-    oReq.open("GET", "http://localhost:2459/getAll");
-    oReq.send();
   }
   render() {
     return (
@@ -127,5 +127,3 @@ ReactDOM.render(
   <BigKanban />,
   document.getElementById('content')
 );
-
-
