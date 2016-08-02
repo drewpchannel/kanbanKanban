@@ -1,32 +1,4 @@
 'use strict';
-/*======================================
-=            XMLHttpRequest            =
-======================================*/
-var oReq = new XMLHttpRequest();
-oReq.addEventListener("load", () => {
-  arrayOne = this
-});
-
-oReq.open("GET", "http://localhost:2359/getAll");
-oReq.send();
-
-/*============================================
-=            Hard-coded Test Data            =
-============================================*/
-var arrayOne = [
-  {id:1, title:'Pray', authors:'jojoebinks'},
-  {id:2, title:'Order Holy Water', authors:'sgnl'},
-  {id:3, title:'Kick it with Big G', authors:'jaywon'},
-  {id:4, title:'Clean confession box', authors:'theRemix'},
-];
-
-var arrayTwo = [
-  {id:11, title:'Order shoes', authors:'jojoebinks'},
-  {id:12, title:'Order booze', authors:'sgnl'},
-  {id:13, title:'Threaten South Korea', authors:'jaywon'},
-  {id:14, title:'Call Son', authors:'theRemix'},
-];
-
 /*==================================
 =            Big Kanban            =
 ==================================*/
@@ -34,33 +6,104 @@ class BigKanban extends React.Component {
   constructor(){
     super();
     this.state = {
-      dataOne : [],
-      second_Data : []
+      toggler : false,
+      ColData : [],
+      ColDataTwo : [],
+      ColDataThree : []
     }
     this.updateCard = this.updateCard.bind(this)
+    this.addCard = this.addCard.bind(this)
+    this.newCard = this.newCard.bind(this)
+    this.deleteCard = this.deleteCard.bind(this)
   };
 
   componentDidMount() {
-    this.setState({
-      dataOne: arrayOne,
-      second_Data: arrayTwo
-    });
-
+    this.getAllCards();
   };
 
-  updateCard(newCard){
-    console.log('We are in updateCard');
-    this.pops.updateCard(this.state)
+  getAllCards(){
+    let componentContext = this;
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", function () {
+      let xhrData = JSON.parse(this.response)
+      componentContext.setState({
+        ColData: xhrData.filter(function (card){
+          return card.status === 'todo';
+        }),
+        ColDataTwo: xhrData.filter(function (card){
+          return card.status === 'doing';
+        }),
+        ColDataThree: xhrData.filter(function (card){
+          return card.status === 'done';
+        }),
+      });
+    });
+    oReq.open("GET", "http://localhost:2459/getAll");
+    oReq.send();
+  }
+
+  updateCard(card) {
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", function (){
+      console.log("Update button calls for u");
+    });
+    oReq.open("GET", "http://localhost:2459/test");
+    oReq.setRequestHeader("Content-Type", "application/json");
+    oReq.send(JSON.stringify({status: 'statusButtonNext'}));
+  }
+
+  newCard(card) {
+    if(this.state.toggler){
+      this.state.toggler = false;
+    }else{
+      this.state.toggler = true;
+    }
+    this.getAllCards();
+  }
+
+  addCard(card) {
+    let componentContext = this;
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", function (){
+      componentContext.getAllCards();
+    });
+    oReq.open("POST", "http://localhost:2459/new");
+    oReq.setRequestHeader("Content-Type", "application/json");
+    oReq.send();
+  }
+
+  deleteCard(cardId) {
+    let componentContext = this;
+    const oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", function (){
+      componentContext.getAllCards();
+    });
+    oReq.open("DELETE", "/delete");
+    oReq.setRequestHeader("Content-Type", "application/json");
+    oReq.send(JSON.stringify({id:cardId}));
   }
 
   render() {
     return (
       <div id="bigk">
         <h1> Big Kanban </h1>
+        <button onClick={this.newCard}>NEW</button> <br/>
+        {this.state.toggler ?
+          <div>
+            <form>
+              First name:<br/>
+              <input type="text" name="firstname" value="Mickey"/>
+              <br/>
+              Last name:<br/>
+              <input type="text" name="lastname" value="Mouse"/>
+              <br/>
+              <input type="submit" value="Submit"/>
+            </form>
+          </div>: null} <br/>
         <div id="postContainer">
-          <PostColumns data={this.state.dataOne} updateCard={this.updateCard} colInfo={'TO DO'}/>
-          <PostColumns data={this.state.second_Data} updateCard={this.updateCard} colInfo={'DOING'}/>
-          <PostColumns data={this.state.second_Data} updateCard={this.updateCard} colInfo={'DONE'}/>
+          <PostColumns data={this.state.ColData} updateCard={this.updateCard} deleteCard={this.deleteCard} colInfo={'TO DO'}/>
+          <PostColumns data={this.state.ColDataTwo}  updateCard={this.updateCard} deleteCard={this.deleteCard} colInfo={'DOING'}/>
+          <PostColumns data={this.state.ColDataThree} updateCard={this.updateCard} deleteCard={this.deleteCard} colInfo={'DONE'}/>
         </div>
       </div>
     );
@@ -72,16 +115,18 @@ class BigKanban extends React.Component {
 ===================================*/
 class PostColumns extends React.Component {
   render() {
+    // console.log("3 tracker",this.props);
     var parent = this;
     var theNode = this.props.data.map((passedData) => {
       return (
         <PostItems {...passedData}
           updateCard={parent.props.updateCard}
-          key={passedData.id}
+          deleteCard={parent.props.deleteCard}
+          getAllCards={parent.props.getAllCards}
+          key={passedData._id}
         />
         )
     });
-    console.log(parent.props);
     return (
       <div id="list">
         <h1>{this.props.colInfo}</h1>
@@ -97,12 +142,13 @@ class PostColumns extends React.Component {
 class PostItems extends React.Component {
   constructor(){
     super()
-    this.state = {id: 0, title: '', priority: '', status: '', createdBy: '', assignedTo: ''}
-    this.updateStatus = this.updateStatus.bind(this)
+    this.state = {_id: 0, title: '', priority: '', status: '', createdBy: '', assignedTo: ''}
+    this.updateCard = this.updateCard.bind(this)
+    this.deleteCard = this.deleteCard.bind(this)
   }
   componentDidMount() {
       this.setState({
-        id: this.props.id,
+        _id: this.props._id,
         title: this.props.title,
         priority: this.props.priority,
         status:this.props.status,
@@ -110,21 +156,25 @@ class PostItems extends React.Component {
         asssignedTo:this.props.assignedTo
       })
   }
-  updateStatus(){
+  updateCard(){
     this.props.updateCard(this.state)
-    var oReq = new XMLHttpRequest();
-    oReq.addEventListener("load", reqListener);
-    oReq.open("GET", "http://localhost:2459/test");
-    oReq.send();
   }
+
+  deleteCard(){
+    this.props.deleteCard(this.state._id);
+  }
+
   render() {
+    // console.log()("4 tracker",this.props);
     return (
-      <div className='theposts'>
+      <div className='theposts' id={this.state._id}>
         <h3>{this.state.title}</h3>
-        <p>{this.state.author}</p>
+            {this.state.priority}<br/>
+
           <div className="buttonDiv">
-            <a className="updateButton" href={this.updateStatus}>Update Status</a>
-            <button> </button>
+            {/*<a className="updateButton" href={this.updateCard}>Update Status</a>*/}
+            <button onClick={this.updateCard}>Update</button>
+            <button onClick={this.deleteCard}>Delete</button>
           </div>
       </div>
     );
