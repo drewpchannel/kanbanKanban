@@ -1,4 +1,5 @@
 'use strict';
+// import {Input} from './models/Input.jsx';
 /*==================================
 =            Big Kanban            =
 ==================================*/
@@ -15,13 +16,15 @@ class BigKanban extends React.Component {
     this.addCard = this.addCard.bind(this)
     this.newCard = this.newCard.bind(this)
     this.deleteCard = this.deleteCard.bind(this)
+    this.removeItAll = this.removeItAll.bind(this)
+    this.seedIt = this.seedIt.bind(this)
   };
 
   componentDidMount() {
-    this.getAllCards();
+    this.getMongoData();
   };
 
-  getAllCards(){
+  getMongoData(){
     let componentContext = this;
     var oReq = new XMLHttpRequest();
     oReq.addEventListener("load", function () {
@@ -58,53 +61,107 @@ class BigKanban extends React.Component {
     }else{
       this.state.toggler = true;
     }
-    this.getAllCards();
+    this.getMongoData();
   }
 
-  addCard(card) {
-    let componentContext = this;
-    var oReq = new XMLHttpRequest();
-    oReq.addEventListener("load", function (){
-      componentContext.getAllCards();
-    });
-    oReq.open("POST", "http://localhost:2459/new");
-    oReq.setRequestHeader("Content-Type", "application/json");
-    oReq.send();
-  }
+  addCard(cardId) {
+      var componentContext = this;
+      const titleVar = document.getElementById('titleField').value;
+      const descVar = document.getElementById('descriptionField').value;
+      const priorityVar = document.getElementById('priorityField').value;
+      const statusVar= document.getElementById('statusField').value;
+      const authorVar = document.getElementById('createdByField').value;
+      const assignedVar = document.getElementById('assignedToField').value;
+      const oReq = new XMLHttpRequest();
+      oReq.addEventListener('load', function(){
+          componentContext.getMongoData();
+      });
+      oReq.open('POST', "/addCard");
+      oReq.setRequestHeader("Content-Type", "application/json")
+      oReq.send(JSON.stringify({
+        title: `${titleVar}`,
+        desc: `${descVar}`,
+        author: `${authorVar}`,
+        handler: `${assignedVar}`,
+        priority: `${priorityVar}`,
+        status: `${statusVar}`
+      }));
+    }
 
   deleteCard(cardId) {
     let componentContext = this;
     const oReq = new XMLHttpRequest();
     oReq.addEventListener("load", function (){
-      componentContext.getAllCards();
+      componentContext.getMongoData();
     });
     oReq.open("DELETE", "/delete");
     oReq.setRequestHeader("Content-Type", "application/json");
     oReq.send(JSON.stringify({id:cardId}));
   }
 
+  removeItAll(cardId) {
+    let componentContext = this;
+    const oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", function (){
+      componentContext.getMongoData();
+    });
+    oReq.open("DELETE", "/removeall");
+    oReq.setRequestHeader("Content-Type", "application/json");
+    oReq.send();
+  }
+
+  seedIt(cardId) {
+    let componentContext = this;
+    const seedVar = document.getElementById('seedId').value;
+    const oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", function (){
+      componentContext.getMongoData();
+    });
+    oReq.open("POST", "/seed");
+    oReq.setRequestHeader("Content-Type", "application/json");
+    oReq.send(JSON.stringify({num:`${seedVar}`}));
+  }
+
   render() {
     return (
       <div id="bigk">
-        <h1> Big Kanban </h1>
-        <button onClick={this.newCard}>NEW</button> <br/>
+        <h1> ƁȉƓ ǨÅȠƁÅȠ</h1>
         {this.state.toggler ?
-          <div>
+          <div id="inputfield">
+            <button onClick={this.newCard}>CLOSE</button> <br/><br/>
             <form>
-              First name:<br/>
-              <input type="text" name="firstname" value="Mickey"/>
-              <br/>
-              Last name:<br/>
-              <input type="text" name="lastname" value="Mouse"/>
-              <br/>
-              <input type="submit" value="Submit"/>
+              Title:<br/>
+              <input type="text" id="titleField" placeholder="Task"/><br/><br/>
+              Description:<br/>
+              <input type="text" id="descriptionField" placeholder="Details"/><br/><br/>
+              Priority:<br/>
+              <select id="priorityField">
+                <option value="urgent">Urgent</option>
+                <option value="necessary">Necessary</option>
+                <option value="mustDo">Must Do</option>
+              </select><br/><br/>
+              Status:<br/>
+              <select id="statusField">
+                <option value="toDo">To Do</option>
+                <option value="doing">Doing</option>
+                <option value="done">Done</option>
+              </select><br/><br/>
+              Created By:<br/>
+              <input type="text" id="createdByField" placeholder="name"/><br/><br/>
+              Assigned To:<br/>
+              <input type="text" id="assignedToField" placeholder="name"/><br/><br/>
+              <button onClick={this.addCarder} type="submit" placeholder="Submit">SUBMIT</button><br/><br/>
             </form>
-          </div>: null} <br/>
+          </div>: <div><button onClick={this.newCard}>NEW MEMO</button></div>} <br/>
+
         <div id="postContainer">
           <PostColumns data={this.state.ColData} updateCard={this.updateCard} deleteCard={this.deleteCard} colInfo={'TO DO'}/>
           <PostColumns data={this.state.ColDataTwo}  updateCard={this.updateCard} deleteCard={this.deleteCard} colInfo={'DOING'}/>
           <PostColumns data={this.state.ColDataThree} updateCard={this.updateCard} deleteCard={this.deleteCard} colInfo={'DONE'}/>
         </div>
+           <br/><button onClick={this.seedIt}>SEED (TEST ONLY)</button>
+           <input type="number" name="seedNothing" id="seedId" min="1" max="9" placeholder="0"/>
+           <button onClick={this.removeItAll}>DROP (TEST ONLY)</button>
       </div>
     );
   };
@@ -117,12 +174,12 @@ class PostColumns extends React.Component {
   render() {
     // console.log("3 tracker",this.props);
     var parent = this;
-    var theNode = this.props.data.map((passedData) => {
+    var theNode = this.props.data.map( function (passedData) {
       return (
         <PostItems {...passedData}
           updateCard={parent.props.updateCard}
           deleteCard={parent.props.deleteCard}
-          getAllCards={parent.props.getAllCards}
+          getMongoData={parent.props.getMongoData}
           key={passedData._id}
         />
         )
@@ -165,7 +222,6 @@ class PostItems extends React.Component {
   }
 
   render() {
-    // console.log()("4 tracker",this.props);
     return (
       <div className='theposts' id={this.state._id}>
         <h3>{this.state.title}</h3>

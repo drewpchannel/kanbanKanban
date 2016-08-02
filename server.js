@@ -50,6 +50,16 @@ router.get('/', function(req, res) {
 /*==============================
 =            Routes            =
 ==============================*/
+function seeder(howMany) {
+  var card;
+  var letters = ['a','q','x','b','r','y','c','s','z'];
+  var stat = ['todo','doing','done','todo','doing','done','todo','doing','done'];
+  for (var i = 0; i < howMany; i++){
+    card = new Card({ "title" : letters[i]+"title", "description" : "some desc", "priority" : "red alert", "status" : stat[i], "createdBy" : "bob", "assignedTo" : "tyler"});
+    card.save();
+  }
+};
+
 app.get('/getAll', function(req, res) {
   Card.find({})
     .then((dataSomething) => {
@@ -61,59 +71,66 @@ app.get('/getAll', function(req, res) {
     });
 });
 
-app.post('/new', (req, res) => {
+app.post('/testpost', (req, res) => {
   var card = new Card({ "title" : "fresh", "description" : "minty", "priority" : "lax", "status" : "todo", "createdBy" : "xin", "assignedTo" : "tyler"});
   card.save();
   res.send({test:"success!"});
 });
 
-app.get('/seed', (req, res) => {
-  var card = new Card({ "title" : "a title", "description" : "some desc", "priority" : "red alert", "status" : "todo", "createdBy" : "bob", "assignedTo" : "tyler"});
+app.post('/addCard', (req, res) => {
+  console.log("HAHAHDSFASFADSF",req.body);
+  var rq = req.body;
+  var card = new Card({
+    title : rq.title,
+    description : rq.desc,
+    priority: rq.priority,
+    status: rq.status,
+    createdBy: rq.author,
+    assignedTo: rq.handler
+  });
   card.save();
-  card = new Card({ "title" : "b title", "description" : "some desc", "priority" : "red alert", "status" : "todo", "createdBy" : "bob", "assignedTo" : "tyler"});
-  card.save();
-  card = new Card({ "title" : "c title", "description" : "some desc", "priority" : "red alert", "status" : "todo", "createdBy" : "bob", "assignedTo" : "tyler"});
-  card.save();
-  card = new Card({ "title" : "q title", "description" : "some desc", "priority" : "red alert", "status" : "doing", "createdBy" : "bob", "assignedTo" : "tyler"});
-  card.save();
-  card = new Card({ "title" : "r title", "description" : "some desc", "priority" : "red alert", "status" : "doing", "createdBy" : "bob", "assignedTo" : "tyler"});
-  card.save();
-  card = new Card({ "title" : "s title", "description" : "some desc", "priority" : "red alert", "status" : "doing", "createdBy" : "bob", "assignedTo" : "tyler"});
-  card.save();
-  card = new Card({ "title" : "x title", "description" : "some desc", "priority" : "red alert", "status" : "done", "createdBy" : "bob", "assignedTo" : "tyler"});
-  card.save();
-  card = new Card({ "title" : "y title", "description" : "some desc", "priority" : "red alert", "status" : "done", "createdBy" : "bob", "assignedTo" : "tyler"});
-  card.save();
-  card = new Card({ "title" : "z title", "description" : "some desc", "priority" : "red alert", "status" : "done", "createdBy" : "bob", "assignedTo" : "tyler"});
-  card.save();
+  res.send({test:"!"});
 });
 
-/*==============================
-=          Test Routes         =
-==============================*/
-// Uses Mongoose to DELETE Posts by _id in database
-// app.delete('/delete/:id', function(req, res) {
+app.post('/seed', (req, res) => {
+  console.log(req.body);
+　seeder(req.body.num);
+  res.json({message: 'Seeded!'});
+});
+
 app.delete('/delete', function(req, res) {
-  console.log("this is del mofo", req.body);
-  Card.remove({_id: req.body.id}, () =>{
+  Card.remove({_id: req.body.id}, () => {
   res.json({message: 'Deleted!'});
   });
 });
+/*==============================
+=          Test Routes         =
+==============================*/
+
+var removeAll = function(db, cb) {
+  Card.find({ _id: { $exists: true}}).remove(cb);
+};
+app.delete('/removeall', function(req, res) {
+  removeAll(db, function(req, res) {
+    Card.find({})
+      .then((dataSomething) => {
+        console.log(dataSomething)
+      })
+      .catch((err) => {
+        console.log('this is the error' + err)
+      });
+  });
+  res.json({message: 'All Deleted!'});
+});
+
 
 
 app.get('/testing', function (req, res) {
-  Card.find({}, function (err, docs) {
+  Card.find({}, (err, docs) => {
       res.json(docs);
   });
 });
 
-app.put('/:cardId', (req, res) => {
-  var query = { _id: 'borne' };
-  Model.update(query, { name: 'jason borne' }, options, callback)
-
-  // is sent as
-  Model.update(query, { $set: { name: 'jason borne' }}, options, callback)
-})
 
 /*======================================
 =            Listener            =
